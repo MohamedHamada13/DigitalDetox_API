@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Confegrations
 {
-    internal class ScreenTimeLogConfigration : IEntityTypeConfiguration<ScreenTimeLog>
+    public class ScreenTimeLogConfigration : IEntityTypeConfiguration<ScreenTimeLog>
     {
         public void Configure(EntityTypeBuilder<ScreenTimeLog> builder)
         {
+            builder.HasKey(s => s.Id);
             builder.HasOne(u => u.User)
                 .WithMany(s => s.ScreenTimeLogs)
-                .HasForeignKey(k => k.UserId);
+                .HasForeignKey(k => k.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

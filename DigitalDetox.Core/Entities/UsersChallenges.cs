@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Entities
 {
-    internal class UsersChallenges
+    public class UsersChallenges
     {
-        // one to many user
-        // one to many challenge
-        public int UserId { get; set; }
-        public int ChallengeId { get; set; }
+        public int? UserId { get; set; }
+        public int? ChallengeId { get; set; }
 
-        public ICollection<User> Users { get; set; } = new HashSet<User>();
-        public ICollection<Challenge> Challenges { get; set; } = new HashSet<Challenge>();
+        public User? User { get; set; } = default!;
+        public Challenge? Challenge { get; set; } = default!;
     }
 }

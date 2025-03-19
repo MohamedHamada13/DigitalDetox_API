@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Entities
 {
-    internal class ScreenTimeLog
+    public class ScreenTimeLog
     {
         public int Id { get; set; }
         public int? UserId { get; set; }
         public DateTime RecordedAt { get; set; }
         public int ScreenTimeMinutes { get; set; }
-        public string AppUsed { get; set; }
-        // navegation 
-        public User User { get; set; }
+        public required string AppUsed { get; set; }
+
+        public User? User { get; set; } = default!;
     }
 }

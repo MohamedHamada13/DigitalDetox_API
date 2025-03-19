@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Confegrations
 {
-    internal class ProgressLogConfigration : IEntityTypeConfiguration<ProgressLog>
+    public class ProgressLogConfigration : IEntityTypeConfiguration<ProgressLog>
     {
         public void Configure(EntityTypeBuilder<ProgressLog> builder)
         {
-            builder.HasKey(x => x.Id);
-            builder.HasOne(u => u.User)
-                .WithMany(p => p.ProgressLogs)
-                .HasForeignKey(f => f.UserId);
+            builder.HasKey(p => p.Id);
+
+            builder.Property(p => p.UserId)
+                .HasDefaultValue(null);
         }
     }
 }

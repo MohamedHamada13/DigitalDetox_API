@@ -6,22 +6,14 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Entities
 {
-    internal class ProgressLog
+    public class ProgressLog
     {
-        /*
-         - Id (int, Primary Key)
-        - UserId (int, Foreign Key referencing User)
-        - RecordedAt (DateTime, required)
-        - ProgressDescription (string, required)
-        - User (Navigation Property, Many-to-One with User)
-         */
-
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public DateTime RecordedAt { get; set; }
-        public string ProgressDescription { get; set; }
-        // navegation 
-        public User User { get; set; }
+        public required string ProgressDescription { get; set; } 
+        
+        public User? User { get; set; } // NP
 
     }
 }

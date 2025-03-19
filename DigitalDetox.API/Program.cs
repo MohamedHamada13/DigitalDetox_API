@@ -1,9 +1,23 @@
+using DigitalDetox.Application.Validators;
+using DigitalDetox.Core.Context;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System;
+
 var builder = WebApplication.CreateBuilder(args);
 
 /// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+builder.Services.AddValidatorsFromAssemblyContaining<ChallengePostDtoValidator>(); 
+builder.Services.AddFluentValidationAutoValidation(); // Provide Automatic validation to registered 
+builder.Services.AddDbContext<DegitalDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))); // Provide mapping dynamic values like DateTime.Now
+
 
 var app = builder.Build();
 
