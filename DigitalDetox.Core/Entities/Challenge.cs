@@ -45,5 +45,13 @@ namespace DigitalDetox.Core.Entities
                 State = ChallengeState.InProgress;
             }
         }
+    
+        // Method For Mapping 
+        public void UpdateFromDto(ChallengePostDto ChaDto)
+        {
+            Title = ChaDto.Title;
+            Description = ChaDto.Description;
+            Duration = ChaDto.Duration;
+        }
     }
 }

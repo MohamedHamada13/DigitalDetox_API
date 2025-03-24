@@ -15,6 +15,8 @@ namespace DigitalDetox.Core.DTOs
         public string Description { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public ChallengeState State { get; set; }
 
         // Ctor for mapping retrieved challenges instead of using AutoMapper
@@ -25,6 +27,8 @@ namespace DigitalDetox.Core.DTOs
             Description = challenge.Description;
             Duration = challenge.Duration;
             CreatedAt = challenge.CreatedAt;
+            StartDate = challenge.StartDate;
+            EndDate = challenge.EndDate;
             State = challenge.State;
         }
     }

@@ -1,5 +1,10 @@
+using DigitalDetox.Application.Servicies;
 using DigitalDetox.Application.Validators;
 using DigitalDetox.Core.Context;
+using DigitalDetox.Core.DTOs;
+using DigitalDetox.Core.Entities;
+using DigitalDetox.Core.Interfaces;
+using DigitalDetox.Infrastructure.Persistance.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,14 +14,26 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 /// Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddFluentValidation(config =>
+    {
+        // To Prevent Data annotation and provide validators Instead
+        config.RegisterValidatorsFromAssemblyContaining<ChallengePostDtoValidator>();
+        config.DisableDataAnnotationsValidation = true; 
+    });
+builder.Services.AddValidatorsFromAssemblyContaining<ChallengePostDtoValidator>();
+builder.Services.AddFluentValidationAutoValidation(); // Provide Automatic validation to registered 
+
+
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
-builder.Services.AddValidatorsFromAssemblyContaining<ChallengePostDtoValidator>(); 
-builder.Services.AddFluentValidationAutoValidation(); // Provide Automatic validation to registered 
 builder.Services.AddDbContext<DegitalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))); // Provide mapping dynamic values like DateTime.Now
+
+builder.Services.AddScoped<IChallengeRepos, ChallengeRepos>();
+builder.Services.AddScoped<IChallengeService, ChallengeService>();
+builder.Services.AddScoped<IValidator<ChallengePostDto>, ChallengePostDtoValidator>(); // Register DTO Validator
 
 
 var app = builder.Build();

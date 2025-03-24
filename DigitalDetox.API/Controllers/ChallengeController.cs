@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DigitalDetox.Application.Validators;
+using DigitalDetox.Core.Interfaces;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace DigitalDetox.API.Controllers
 {
@@ -14,24 +16,23 @@ namespace DigitalDetox.API.Controllers
     public class ChallengeController : ControllerBase
     {
         private readonly DegitalDbContext _context;
-        public ChallengeController(DegitalDbContext context)
+        private readonly IChallengeService _challengeService;
+        public ChallengeController(DegitalDbContext context, IChallengeService challengeService)
         {
             _context = context;
+            _challengeService = challengeService;
         }
 
         #region GET Actions
         [HttpGet] // Apply Pagination
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<ChallengeGetDto>>> GetChallenges()
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<List<ChallengeGetDto>?>> GetChallenges()
         {
-            var challenges = await _context.Challenges.ToListAsync();
+            var challengesDto = await _challengeService.GetChallenges();
 
-            if (challenges == null || challenges.Count <= 0)
-                return NotFound();
-
-            List<ChallengeGetDto> challengesDto = challenges.Select(ch => new ChallengeGetDto(ch)).ToList();
+            if (challengesDto == null || challengesDto.Count <= 0)
+                return NoContent();
 
             return Ok(challengesDto);
         }
@@ -39,16 +40,11 @@ namespace DigitalDetox.API.Controllers
         [HttpGet("started")] // Apply Pagination
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<List<ChallengeGetStartedDto>>> GetStartedChallenges()
+        public async Task<ActionResult<List<ChallengeGetDto>?>> GetStartedChallenges()
         {
-            List<Challenge> challenges = await _context.Challenges
-                .Where(ch => ch.State == ChallengeState.InProgress)
-                .ToListAsync();
-
-            if (challenges == null || challenges.Count <= 0)
+            var challengesDto = await _challengeService.GetStartedChallenges();
+            if (challengesDto == null || challengesDto.Count <= 0)
                 return NoContent();
-
-            List<ChallengeGetStartedDto> challengesDto = challenges.Select(ch => new ChallengeGetStartedDto(ch)).ToList();
 
             return Ok(challengesDto);
         }
@@ -56,35 +52,37 @@ namespace DigitalDetox.API.Controllers
         [HttpGet("done")] // Apply Pagination
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<List<ChallengeGetStartedDto>>> GetAchivedChallenges()
+        public async Task<ActionResult<List<ChallengeGetDto>>> GetAchivedChallenges()
         {
-            List<Challenge> challenges = await _context.Challenges
-                .Where(ch => ch.State == ChallengeState.Done)
-                .ToListAsync();
-
-            if (challenges == null || challenges.Count <= 0)
-                return NoContent();
-
-            List<ChallengeGetStartedDto> challengesDto = challenges.Select(ch => new ChallengeGetStartedDto(ch)).ToList();
-
-            return Ok(challengesDto);
+            try
+            {
+                var challengesDto = await _challengeService.GetAchivedChallenges();
+                return Ok(challengesDto);
+            }
+            catch(KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ChallengeGetDto>> GetChallengeById(int id)
+        public async Task<ActionResult<ChallengeGetDto?>> GetChallengeByIdAsync(int id)
         {
             if (id <= 0) 
                 return BadRequest();
 
-            var challenge = await _context.Challenges.FindAsync(id);
-            if (challenge == null)
-                return NotFound();
-
-            ChallengeGetDto challengeDto = new ChallengeGetDto(challenge);
-            return Ok(challengeDto);
+            try
+            {
+                var challenge = await _challengeService.GetChallenge(id);
+                return Ok(challenge);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
         #endregion
 
@@ -94,21 +92,8 @@ namespace DigitalDetox.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateChallenge([FromBody] ChallengePostDto newChallenge)
         {
-            #region Manual Validation before using automatic validation from assemply using FluentValidation.AspNetCore tool
-            /*
-            var challengePostValidator = new ChallengePostDtoValidator();
-            var validationResult = challengePostValidator.Validate(newChallenge);
-
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
-            */
-            #endregion
-            // Creation Process
-            var challenge = new Challenge(newChallenge); // Mapping
-            await _context.Challenges.AddAsync(challenge);
-            await _context.SaveChangesAsync();
-            
-            return CreatedAtAction(nameof(GetChallengeById), new { id = challenge.Id }, new ChallengeGetDto(challenge));
+            await _challengeService.AddChallengeAsync(newChallenge);
+            return Ok("Challenge Has been created");
         }
 
         [HttpPost("bulk")]
@@ -150,8 +135,29 @@ namespace DigitalDetox.API.Controllers
             challenge.StartChallenge();
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Challenge started", StartDate = challenge.StartDate, EndDate = challenge.EndDate });
+            return Ok(new { Message = $"{challenge.Title} Challenge has started", StartDate = challenge.StartDate, EndDate = challenge.EndDate });
         }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ChallengeGetDto>?> UpdateChallenge(int id, ChallengePostDto newChallenge)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid Id value");
+
+            try
+            {
+                var challengeDto = await _challengeService.UpdateChallengeAsync(id, newChallenge);
+                return Ok(challengeDto);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
 
         [HttpPut("{id}/MakeDone")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -181,41 +187,41 @@ namespace DigitalDetox.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CancelChallenge(int id)
         {
-            var challenge = await _context.Challenges.FindAsync(id);
-
-            if (challenge == null)
-                return NotFound();
-
-            if (challenge.State == ChallengeState.InProgress)
+            try
             {
-                challenge.State = ChallengeState.Pending;
-                await _context.SaveChangesAsync();
-                return Ok($"'{challenge.Title}' challenge has canceled");
+                var chaDto = await _challengeService.CancelChallengeAsync(id);
+                return Ok($"{chaDto?.Title} has been canceled.");
             }
-
-            return BadRequest($"'{challenge.Title}' already not in progress");
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
         #endregion
 
         #region DELETE Actions
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> DeleteChallenge(int id)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ChallengeGetDto?>> DeleteChallenge(int id)
         {
             if (id <= 0)
-                return BadRequest();
+                return BadRequest(new { message = "Invalid id value" });
 
-            Challenge? challenge = await _context.Challenges.FindAsync(id);
-
-            if (challenge == null) 
-                return NotFound();
-
-            _context.Challenges.Remove(challenge);
-            await _context.SaveChangesAsync();
-
-            return Ok($"`{challenge.Title}` challenge has been deleted");
+            try
+            {
+                var deletedChallenge = await _challengeService.DeleteChallengeAsync(id);
+                return Ok($"`{deletedChallenge?.Title}` challenge has been deleted");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
         #endregion
     }

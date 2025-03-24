@@ -23,6 +23,7 @@ namespace DigitalDetox.Application.Validators
 
             RuleFor(c => c.Duration)
                 .GreaterThan(TimeSpan.Zero).WithMessage("Duration must be greater than 0");
+
         }
     }
 }
