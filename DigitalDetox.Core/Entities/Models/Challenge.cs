@@ -1,5 +1,4 @@
 ﻿using DigitalDetox.Core.Enums;
-using DigitalDetox.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using DigitalDetox.Core.DTOs.ChallengeDto;
 
-namespace DigitalDetox.Core.Entities
+namespace DigitalDetox.Core.Entities.Models
 {
     public class Challenge
     {
@@ -18,10 +18,11 @@ namespace DigitalDetox.Core.Entities
         public TimeSpan Duration { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? StartDate { get; set; } = null!; // Lazy Initialization
-        public DateTime? EndDate { get; set; } = null!;  // Lazy Initialization
+        public DateTime? EndDate { get; set; } = null!; // Lazy Initialization
         public ChallengeState State { get; set; } = ChallengeState.Pending; // Configured as Pending in Configurations too
 
-        public ICollection<UsersChallenges>? UserChallenges { get; set; } = new List<UsersChallenges>(); // NP
+        public string? UserId { get; set; } // FK
+        public AppUser? User { get; set; } // NP
 
         // Declaring an Initial constructor very important for migrations
         public Challenge() { }
@@ -45,7 +46,7 @@ namespace DigitalDetox.Core.Entities
                 State = ChallengeState.InProgress;
             }
         }
-    
+
         // Method For Mapping 
         public void UpdateFromDto(ChallengePostDto ChaDto)
         {

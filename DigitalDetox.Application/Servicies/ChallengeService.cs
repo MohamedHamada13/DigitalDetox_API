@@ -1,5 +1,5 @@
-﻿using DigitalDetox.Core.DTOs;
-using DigitalDetox.Core.Entities;
+﻿using DigitalDetox.Core.DTOs.ChallengeDto;
+using DigitalDetox.Core.Entities.Models;
 using DigitalDetox.Core.Enums;
 using DigitalDetox.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;

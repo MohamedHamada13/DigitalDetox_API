@@ -1,4 +1,4 @@
-﻿using DigitalDetox.Core.Entities;
+﻿using DigitalDetox.Core.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -14,11 +14,12 @@ namespace DigitalDetox.Core.Confegrations
         public void Configure(EntityTypeBuilder<ScreenTimeLog> builder)
         {
             builder.HasKey(s => s.Id);
-            builder.HasOne(u => u.User)
-                .WithMany(s => s.ScreenTimeLogs)
-                .HasForeignKey(k => k.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
 
+            // RS with AppUser
+            builder.HasOne(s => s.User)
+                .WithMany(u => u.ScreenTimeLogs)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

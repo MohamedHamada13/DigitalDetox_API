@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using DigitalDetox.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DigitalDetox.Core.DTOs.ChallengeDto;
 
 
 namespace DigitalDetox.Application.Validators

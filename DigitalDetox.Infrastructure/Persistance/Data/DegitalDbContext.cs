@@ -1,4 +1,5 @@
-﻿using DigitalDetox.Core.Entities;
+﻿using DigitalDetox.Core.Entities.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Context
 {
-    public class DegitalDbContext : DbContext
+    public class DegitalDbContext : IdentityDbContext<AppUser>
     {
         public DegitalDbContext(DbContextOptions<DegitalDbContext> options) : base(options) { }
 
-        public DbSet<User> Users{ get; set; }
         public DbSet<ScreenTimeLog> ScreenTimeLogs { get; set; }
         public DbSet<ProgressLog> ProgressLogs{ get; set; }
         public DbSet<DetoxPlan> DetoxPlans { get; set; }
@@ -21,11 +21,7 @@ namespace DigitalDetox.Core.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ProgressLog>()
-                .HasOne(pl => pl.User)
-                .WithMany(u => u.ProgressLogs)
-                .HasForeignKey(pl => pl.UserId)
-                .OnDelete(DeleteBehavior.Restrict); 
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         }
     }

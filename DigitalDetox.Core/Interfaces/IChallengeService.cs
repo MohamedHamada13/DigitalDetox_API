@@ -1,4 +1,4 @@
-﻿using DigitalDetox.Core.DTOs;
+﻿using DigitalDetox.Core.DTOs.ChallengeDto;
 using DigitalDetox.Core.Entities;
 using System;
 using System.Collections.Generic;

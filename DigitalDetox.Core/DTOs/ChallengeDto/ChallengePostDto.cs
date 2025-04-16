@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDetox.Core.DTOs
+namespace DigitalDetox.Core.DTOs.ChallengeDto
 {
     public class ChallengePostDto
     {

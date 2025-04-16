@@ -1,13 +1,13 @@
-﻿using DigitalDetox.Core.DTOs;
-using DigitalDetox.Core.Context;
+﻿using DigitalDetox.Core.Context;
 using DigitalDetox.Core.Enums;
-using DigitalDetox.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DigitalDetox.Application.Validators;
 using DigitalDetox.Core.Interfaces;
 using Microsoft.AspNetCore.Components.Forms;
+using DigitalDetox.Core.Entities.Models;
+using DigitalDetox.Core.DTOs.ChallengeDto;
 
 namespace DigitalDetox.API.Controllers
 {

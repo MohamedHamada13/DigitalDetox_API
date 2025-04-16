@@ -1,4 +1,4 @@
-﻿using DigitalDetox.Core.Entities;
+﻿using DigitalDetox.Core.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -15,14 +15,17 @@ namespace DigitalDetox.Core.Confegrations
         {
             builder.HasKey(d => d.Id);
 
-            builder.Property(p => p.Title).IsRequired();
+            builder.Property(p => p.Title)
+                .IsRequired()
+                .HasMaxLength(100);
 
             builder.Property(p => p.CreatedAt)
                 .HasDefaultValue(DateTime.Now);
 
-            builder.HasOne(u => u.User)
-                .WithMany(d => d.DetoxPlans)
-                .HasForeignKey(k => k.UserId)
+            // RS with AppUser
+            builder.HasOne(d => d.User)
+                .WithMany(u => u.DetoxPlans)
+                .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

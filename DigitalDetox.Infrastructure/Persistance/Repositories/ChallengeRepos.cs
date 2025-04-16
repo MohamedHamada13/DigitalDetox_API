@@ -1,6 +1,6 @@
 ﻿using DigitalDetox.Core.Context;
 using DigitalDetox.Core.DTOs;
-using DigitalDetox.Core.Entities;
+using DigitalDetox.Core.Entities.Models;
 using DigitalDetox.Core.Enums;
 using DigitalDetox.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;

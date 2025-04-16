@@ -4,6 +4,7 @@ using DigitalDetox.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalDetox.Infrastructure.Migrations
 {
     [DbContext(typeof(DegitalDbContext))]
-    partial class DegitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415202502_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,6 +87,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RefreshToken")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RefreshTokenExpiryTime")
@@ -170,7 +174,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 4, 15, 22, 42, 56, 146, DateTimeKind.Local).AddTicks(4830));
+                        .HasDefaultValue(new DateTime(2025, 4, 15, 22, 25, 0, 981, DateTimeKind.Local).AddTicks(4407));
 
                     b.Property<string>("Description")
                         .IsRequired()

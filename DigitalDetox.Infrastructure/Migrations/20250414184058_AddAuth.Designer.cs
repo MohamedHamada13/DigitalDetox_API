@@ -4,6 +4,7 @@ using DigitalDetox.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalDetox.Infrastructure.Migrations
 {
     [DbContext(typeof(DegitalDbContext))]
-    partial class DegitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414184058_AddAuth")]
+    partial class AddAuth
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace DigitalDetox.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.AppUser", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -39,7 +42,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<DateOnly?>("DateOfBirth")
+                    b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<string>("Email")
@@ -83,12 +86,6 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RefreshTokenExpiryTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -112,7 +109,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.Challenge", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.Challenge", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +156,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.ToTable("Challenges");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.DetoxPlan", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.DetoxPlan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -170,7 +167,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 4, 15, 22, 42, 56, 146, DateTimeKind.Local).AddTicks(4830));
+                        .HasDefaultValue(new DateTime(2025, 4, 14, 20, 40, 57, 223, DateTimeKind.Local).AddTicks(8959));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -197,7 +194,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.ToTable("DetoxPlans");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.ProgressLog", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.ProgressLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -222,7 +219,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.ToTable("ProgressLogs");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.ScreenTimeLog", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.ScreenTimeLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -383,9 +380,9 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.Challenge", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.Challenge", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", "User")
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", "User")
                         .WithMany("Challenges")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -393,9 +390,9 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.DetoxPlan", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.DetoxPlan", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", "User")
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", "User")
                         .WithMany("DetoxPlans")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -403,9 +400,9 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.ProgressLog", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.ProgressLog", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", "User")
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", "User")
                         .WithMany("ProgressLogs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -413,9 +410,9 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.ScreenTimeLog", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.ScreenTimeLog", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", "User")
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", "User")
                         .WithMany("ScreenTimeLogs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -434,7 +431,7 @@ namespace DigitalDetox.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", null)
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -443,7 +440,7 @@ namespace DigitalDetox.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", null)
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -458,7 +455,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", null)
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -467,14 +464,14 @@ namespace DigitalDetox.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("DigitalDetox.Core.Entities.Models.AppUser", null)
+                    b.HasOne("DigitalDetox.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.AppUser", b =>
+            modelBuilder.Entity("DigitalDetox.Core.Entities.AppUser", b =>
                 {
                     b.Navigation("Challenges");
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDetox.Core.Entities
+namespace DigitalDetox.Core.Entities.Models
 {
     public class DetoxPlan
     {
@@ -14,8 +14,8 @@ namespace DigitalDetox.Core.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime CreatedAt { get; set; } // For Creator(Admin) not user 
-        
-        public int? UserId { get; set; } // FK
-        public User? User { get; set; } = default!; // NP
+
+        public string? UserId { get; set; } // FK
+        public AppUser? User { get; set; } // NP
     }
 }

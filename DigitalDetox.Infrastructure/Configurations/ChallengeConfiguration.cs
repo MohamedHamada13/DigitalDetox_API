@@ -1,4 +1,4 @@
-﻿using DigitalDetox.Core.Entities;
+﻿using DigitalDetox.Core.Entities.Models;
 using DigitalDetox.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -32,6 +32,12 @@ namespace DigitalDetox.Infrastructure.Configurations
 
             builder.Property(c => c.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
+
+            // RS with AppUser
+            builder.HasOne(c => c.User)
+                .WithMany(u => u.Challenges)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
