@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDetox.Core.DTOs.Auth
+namespace DigitalDetox.Core.Entities.AuthModels
 {
-    public class AddRoleModel
+    public class LoginModel
     {
         [Required]
-        public string UserId { get; set; }
+        public string Email { get; set; }
+
         [Required]
-        public string RoleName { get; set; }
+        public string Password { get; set; }
     }
 }

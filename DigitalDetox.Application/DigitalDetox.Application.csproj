@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalDetox.Core\DigitalDetox.Core.csproj" />
+    <ProjectReference Include="..\DigitalDetox.Infrastructure\DigitalDetox.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

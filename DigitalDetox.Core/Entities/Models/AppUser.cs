@@ -1,4 +1,4 @@
-﻿using DigitalDetox.Core.DTOs.Auth;
+﻿using DigitalDetox.Core.Entities.AuthModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -30,12 +30,23 @@ namespace DigitalDetox.Core.Entities.Models
         public AppUser() { }
 
         // Map the `RegisterModel` into `AppUser`
-        public AppUser(RegisterModel model)
+        public AppUser(SignUpReqModel model)
         {
             FirstName = model.FirstName;
             LastName = model.LastName;
             DateOfBirth = model.DateOfBirth;
             CreatedAt = DateTime.Now;
+
+            Email = model.Email;
+            UserName = model.UserName;
+        }
+
+        public AppUser(UserStoreTemporary model)
+        {
+            FirstName = model.FirstName;
+            LastName = model.LastName;
+            DateOfBirth = model.DateOfBirth;
+            CreatedAt = DateTime.UtcNow;
 
             Email = model.Email;
             UserName = model.UserName;

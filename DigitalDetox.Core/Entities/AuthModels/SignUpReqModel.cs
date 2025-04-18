@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDetox.Core.DTOs.Auth
+namespace DigitalDetox.Core.Entities.AuthModels
 {
-    public class RegisterModel
+    public class SignUpReqModel
     {
         [Required, MaxLength(80)]
         public string FirstName { get; set; }
@@ -26,7 +26,5 @@ namespace DigitalDetox.Core.DTOs.Auth
 
         [Required]
         public DateOnly? DateOfBirth { get; set; }
-        
-
     }
 }

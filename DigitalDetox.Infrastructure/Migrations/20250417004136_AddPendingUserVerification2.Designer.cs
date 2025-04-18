@@ -4,6 +4,7 @@ using DigitalDetox.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalDetox.Infrastructure.Migrations
 {
     [DbContext(typeof(DegitalDbContext))]
-    partial class DegitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250417004136_AddPendingUserVerification2")]
+    partial class AddPendingUserVerification2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,7 +173,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 4, 18, 6, 42, 57, 295, DateTimeKind.Local).AddTicks(7295));
+                        .HasDefaultValue(new DateTime(2025, 4, 17, 2, 41, 34, 145, DateTimeKind.Local).AddTicks(4292));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -195,6 +198,46 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("DetoxPlans");
+                });
+
+            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.PendingUserVerification", b =>
+                {
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.ToTable("PendingUserVerifications");
                 });
 
             modelBuilder.Entity("DigitalDetox.Core.Entities.Models.ProgressLog", b =>
@@ -248,47 +291,6 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ScreenTimeLogs");
-                });
-
-            modelBuilder.Entity("DigitalDetox.Core.Entities.Models.UserStoreTemporary", b =>
-                {
-                    b.Property<string>("Email")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("DateOfBirth")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Email");
-
-                    b.ToTable("UserStoreTemporary");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

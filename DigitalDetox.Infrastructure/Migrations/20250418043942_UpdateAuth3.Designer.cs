@@ -4,6 +4,7 @@ using DigitalDetox.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalDetox.Infrastructure.Migrations
 {
     [DbContext(typeof(DegitalDbContext))]
-    partial class DegitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418043942_UpdateAuth3")]
+    partial class UpdateAuth3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,7 +173,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 4, 18, 6, 42, 57, 295, DateTimeKind.Local).AddTicks(7295));
+                        .HasDefaultValue(new DateTime(2025, 4, 18, 6, 39, 40, 798, DateTimeKind.Local).AddTicks(767));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -288,7 +291,7 @@ namespace DigitalDetox.Infrastructure.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("UserStoreTemporary");
+                    b.ToTable("PendingUserVerifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

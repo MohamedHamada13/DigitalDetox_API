@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDetox.Core.DTOs.Auth
+namespace DigitalDetox.Core.DTOs
 {
-    public class LoginModel
+    public class VerifyCodeModel
     {
         [Required]
         public string Email { get; set; }
-
         [Required]
-        public string Password { get; set; }
+        public string Code { get; set; }
+
     }
 }

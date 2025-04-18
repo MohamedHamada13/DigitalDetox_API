@@ -14,8 +14,9 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Text;
 using DigitalDetox.Core.Entities.Models;
-using DigitalDetox.Core.Entities.Auth;
 using DigitalDetox.Core.DTOs.ChallengeDto;
+using DigitalDetox.Infrastructure.ExServices;
+using DigitalDetox.Core.Entities.AuthModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,15 @@ builder.Services.AddScoped<IChallengeRepos, ChallengeRepos>();
 builder.Services.AddScoped<IChallengeService, ChallengeService>();
 builder.Services.AddScoped<IValidator<ChallengePostDto>, ChallengePostDtoValidator>(); // Register DTO Validator
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserStoreTemporaryRepos, UserStoreTemporaryRepos>();
+
+
+// Enable Email Confirmation in Identity Config
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = true;
+});
 
 // Auth Configurations
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT")); // Map appsetting JWT values into JWT class.

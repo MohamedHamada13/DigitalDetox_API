@@ -1,5 +1,5 @@
 ﻿using Azure.Core;
-using DigitalDetox.Core.DTOs.Auth;
+using DigitalDetox.Core.Entities.AuthModels;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
@@ -12,10 +12,12 @@ namespace DigitalDetox.Core.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthModel> RegisterAsync(RegisterModel model);
         Task<AuthModel> LoginAsync(LoginModel model);
         Task<AuthModel> RefreshTokenAsync(string token);
         Task<bool> LogoutAsync(string refreshToken);
-        Task<string> AddRoleAsync(AddRoleModel model);
+        Task<AuthModel> AddRoleAsync(AddRoleModel model);
+        Task<SignUpResponse> InitSignUpAsync(SignUpReqModel model);
+        Task<AuthModel> VerifyCodeAsync(string email, string inputCode);
+        Task<SignUpResponse> ReSendCode(string email);
     }
 }

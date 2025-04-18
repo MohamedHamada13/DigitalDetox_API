@@ -18,6 +18,8 @@ namespace DigitalDetox.Core.Context
         public DbSet<ProgressLog> ProgressLogs{ get; set; }
         public DbSet<DetoxPlan> DetoxPlans { get; set; }
         public DbSet<Challenge> Challenges { get; set; }
+        public DbSet<UserStoreTemporary> UserStoreTemporary { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
