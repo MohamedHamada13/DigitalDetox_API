@@ -9,11 +9,11 @@ namespace DigitalDetox.Core.Interfaces
 {
     public interface IGenericRepos<T> where T : class
     {
-        IQueryable<T>? GetChallenges();
-        Task<T?> GetChallengeAsync(int id);
-        Task AddChallengeAsync(T entity);
-        void UpdateChallengeAsync(T entity);
-        void DeleteChallengeAsync(T entity);
+        IQueryable<T>? GetAll();
+        Task<T?> GetAsync(int id);
+        Task AddAsync(T entity);
+        void UpdateAsync(T entity);
+        void DeleteAsync(T entity);
         Task SaveAsync();
     }
 }

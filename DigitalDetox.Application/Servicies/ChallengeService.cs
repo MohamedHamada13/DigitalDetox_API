@@ -27,7 +27,7 @@ namespace DigitalDetox.Application.Servicies
         /// Note_4: Throw an exception here, and handle it in the controller using TryCatch.
         public async Task<List<ChallengeGetDto>?> GetChallenges()
         {
-            var challenges = _Repos.GetChallenges();
+            var challenges = _Repos.GetAll();
             if (challenges == null || !challenges.Any())
                 throw new KeyNotFoundException("No challenges found!");
 
@@ -37,7 +37,7 @@ namespace DigitalDetox.Application.Servicies
 
         public async Task<ChallengeGetDto?> GetChallenge(int id)
         {
-            var challenge = await _Repos.GetChallengeAsync(id);
+            var challenge = await _Repos.GetAsync(id);
             if (challenge == null)
                 throw new KeyNotFoundException("Challenge Not Found!");
 
@@ -61,11 +61,11 @@ namespace DigitalDetox.Application.Servicies
 
         public async Task<ChallengeGetDto?> DeleteChallengeAsync(int id)
         {
-            var challenge = await _Repos.GetChallengeAsync(id);
+            var challenge = await _Repos.GetAsync(id);
             if (challenge == null)
                 throw new KeyNotFoundException("Challenge not found.");
 
-            _Repos.DeleteChallengeAsync(challenge);
+            _Repos.DeleteAsync(challenge);
             await _Repos.SaveAsync();
 
             ChallengeGetDto challengeDto = new ChallengeGetDto(challenge);
@@ -75,19 +75,19 @@ namespace DigitalDetox.Application.Servicies
         public async Task AddChallengeAsync(ChallengePostDto newChallenge)
         {
             Challenge challenge = new Challenge(newChallenge);
-            await _Repos.AddChallengeAsync(challenge);
+            await _Repos.AddAsync(challenge);
             await _Repos.SaveAsync();
         }
 
         public async Task<ChallengeGetDto> UpdateChallengeAsync(int id, ChallengePostDto newChallenge)
         {
-            Challenge? oldCha = await _Repos.GetChallengeAsync(id);
+            Challenge? oldCha = await _Repos.GetAsync(id);
             if (oldCha == null)
                 throw new KeyNotFoundException("Challenge not found.");
 
             oldCha.UpdateFromDto(newChallenge);
 
-            _Repos.UpdateChallengeAsync(oldCha);
+            _Repos.UpdateAsync(oldCha);
             await _Repos.SaveAsync();
 
             ChallengeGetDto challengeDto = new ChallengeGetDto(oldCha);
@@ -96,7 +96,7 @@ namespace DigitalDetox.Application.Servicies
 
         public async Task<ChallengeGetDto?> CancelChallengeAsync(int id)
         {
-            var challenge = await _Repos.GetChallengeAsync(id);
+            var challenge = await _Repos.GetAsync(id);
             if (challenge == null)
                 throw new KeyNotFoundException("Challenge Not Found");
 

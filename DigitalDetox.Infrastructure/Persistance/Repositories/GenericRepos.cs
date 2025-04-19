@@ -20,27 +20,27 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
             _dbSet = ctx.Set<T>();
         }
 
-        public IQueryable<T>? GetChallenges()
+        public IQueryable<T>? GetAll()
         {
             return _dbSet.AsQueryable();
         }
 
-        public async Task<T?> GetChallengeAsync(int id)
+        public async Task<T?> GetAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task AddChallengeAsync(T entity)
+        public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public void DeleteChallengeAsync(T entity)
+        public void DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
         }
 
-        public void UpdateChallengeAsync(T entity)
+        public void UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
         }

@@ -61,7 +61,7 @@ namespace DigitalDetox.API.Controllers
             var result = await _authService.LoginAsync(model);
             
             if (!result.IsAuthenticated)
-                return BadRequest(result.FaildMessage);
+                return Unauthorized(result.FaildMessage);
 
             //return Ok(new { result.UserName, result.Token, result.ExpiresOn, result.RefreshToken, result.RefreshTokenExpiration });
             return Ok(result);

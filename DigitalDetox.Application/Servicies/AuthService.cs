@@ -38,6 +38,19 @@ namespace DigitalDetox.Application.Servicies
             if (await _userManager.FindByNameAsync(model.UserName) is not null)
                 return new SignUpResponse { FaildMessage = $"username `{model.UserName}` is already used" };
 
+            // 🔐 Validate the password
+            foreach (var validator in _userManager.PasswordValidators)
+            {
+                var validationResult = await validator.ValidateAsync(_userManager, null!, model.Password);
+                if (!validationResult.Succeeded)
+                {
+                    return new SignUpResponse
+                    {
+                        FaildMessage = string.Join(", ", validationResult.Errors.Select(e => e.Description))
+                    };
+                }
+            }
+
             // check if the user is already in pending verification
             var existingPending = await _UserStoreCtx.GetByEmail(model.Email);
 

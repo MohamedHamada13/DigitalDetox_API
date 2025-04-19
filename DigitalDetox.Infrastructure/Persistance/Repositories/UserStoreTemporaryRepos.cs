@@ -40,6 +40,7 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
             _ctx.UserStoreTemporary.Update(model);
             await SaveAsync();
         }
+        
         public async Task SaveAsync()
         {
             await _ctx.SaveChangesAsync();
