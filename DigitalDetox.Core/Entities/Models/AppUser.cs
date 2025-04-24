@@ -21,7 +21,7 @@ namespace DigitalDetox.Core.Entities.Models
         public DateTime RefreshTokenExpiryTime { get; set; }
 
         public ICollection<DetoxPlan>? DetoxPlans { get; set; } // NP
-        public ICollection<DailyUsageLog>? DailyUsageLogs { get; set; }
+        public ICollection<UserUsageLog>? DailyUsageLogs { get; set; }
         public ICollection<ProgressLog>? ProgressLogs { get; set; }
         public ICollection<Challenge>? Challenges { get; set; }
 

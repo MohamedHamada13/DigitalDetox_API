@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Confegrations
 {
-    public class DailyUsageLogConfig : IEntityTypeConfiguration<DailyUsageLog>
+    public class DailyUsageLogConfig : IEntityTypeConfiguration<UserUsageLog>
     {
-        public void Configure(EntityTypeBuilder<DailyUsageLog> builder)
+        public void Configure(EntityTypeBuilder<UserUsageLog> builder)
         {
             builder.HasKey(d => d.Id);
 
@@ -24,6 +24,16 @@ namespace DigitalDetox.Core.Confegrations
                 .IsRequired();
             builder.Property(d => d.DailyLogDate)
                 .IsRequired();
+
+            // This ensures EF knows how to map DateOnly to a SQL column, because SQL only understands DateTime or date.
+            builder.Property(d => d.DailyLogDate)
+                   .HasConversion(
+                       v => v.ToDateTime(TimeOnly.MinValue),   // Convert DateOnly -> DateTime for the DB
+                       v => DateOnly.FromDateTime(v)           // Convert DateTime -> DateOnly from the DB
+                   )
+                   .HasColumnType("date") // Optional: use SQL Server "date" type (no time component)
+                   .IsRequired();
+
 
             // RS with AppUser
             builder.HasOne(d => d.User)

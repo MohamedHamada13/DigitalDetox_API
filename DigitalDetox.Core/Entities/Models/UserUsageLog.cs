@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Entities.Models
 {
-    public class DailyUsageLog
+    public class UserUsageLog
     {
         public int Id { get; set; }
         public TimeSpan UsageTime { get; set; }
-        public DateTime DailyLogDate { get; set; } // Should store only the date (no time) if per-day log [DateTime.Date]
+        public DateOnly DailyLogDate { get; set; } 
 
         public int AppId { get; set; }
         public App App { get; set; } = default!;

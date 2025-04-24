@@ -14,7 +14,7 @@ namespace DigitalDetox.Core.Context
     {
         public DegitalDbContext(DbContextOptions<DegitalDbContext> options) : base(options) { }
 
-        public DbSet<DailyUsageLog> DailyUsageLogs { get; set; }
+        public DbSet<UserUsageLog> DailyUsageLogs { get; set; }
         public DbSet<App> Apps { get; set; }
         public DbSet<ProgressLog> ProgressLogs{ get; set; }
         public DbSet<DetoxPlan> DetoxPlans { get; set; }

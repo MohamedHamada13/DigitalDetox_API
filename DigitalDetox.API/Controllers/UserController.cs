@@ -24,11 +24,5 @@ namespace DigitalDetox.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers() => 
             Ok(await _userService.GetAllUsers());
-
-        //[HttpPut("Edit")]
-        //public async Task<IActionResult> UpdateUser(string Id)
-        //{
-
-        //}
     }
 }

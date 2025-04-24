@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.Interfaces
 {
-    public interface IDailyUsageLogRepos : IGenericRepos<DailyUsageLog>
+    public interface IDailyUsageLogRepos : IGenericRepos<UserUsageLog>
     {
-
+        public Task<UserUsageLog?> GetLogByUserAppDate(string userId, int appId, DateOnly logDate);
+        public IQueryable<UserUsageLog>? GetDailyLogs(string userId, DateOnly dayDate);
+        public IQueryable<UserUsageLog>? GetLogsInRange(string userId, DateOnly startOfRange, DateOnly endOfRange);
     }
 }

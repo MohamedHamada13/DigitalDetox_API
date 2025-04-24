@@ -17,6 +17,7 @@ using DigitalDetox.Core.Entities.Models;
 using DigitalDetox.Core.DTOs.ChallengeDto;
 using DigitalDetox.Infrastructure.ExServices;
 using DigitalDetox.Core.Entities.AuthModels;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,12 +33,18 @@ builder.Services.AddDbContext<DegitalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))); // Provide mapping dynamic values like DateTime.Now
 
+builder.Services.AddScoped<IDailyUsageLogService, DailyUsageLogService>();
 builder.Services.AddScoped<IChallengeRepos, ChallengeRepos>();
 builder.Services.AddScoped<IChallengeService, ChallengeService>();
 builder.Services.AddScoped<IValidator<ChallengePostDto>, ChallengePostDtoValidator>(); // Register DTO Validator
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserStoreTemporaryRepos, UserStoreTemporaryRepos>();
+builder.Services.AddScoped<IAppRepos, AppRepos>();
+builder.Services.AddScoped<IDailyUsageLogRepos, DailyUsageLogRepos>();
+
+
+
 
 // Add CORS Services
 builder.Services.AddCors(options =>
@@ -78,7 +85,8 @@ builder.Services.AddAuthentication(options => // Configure the default Schema
             ValidateLifetime = true,
             ValidIssuer = builder.Configuration["JWT:Issuer"],
             ValidAudience = builder.Configuration["JWT:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+            RoleClaimType = ClaimTypes.Role
         };
     });
 

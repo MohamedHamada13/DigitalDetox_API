@@ -148,7 +148,6 @@ namespace DigitalDetox.Application.Servicies
 
 
 
-
         public async Task<AuthModel> LoginAsync(LoginModel model)
         {
             // Check if the user exists and get him

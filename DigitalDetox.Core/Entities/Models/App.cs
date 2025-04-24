@@ -11,6 +11,6 @@ namespace DigitalDetox.Core.Entities.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<DailyUsageLog>? DailyLogs { get; set; } = new List<DailyUsageLog>();
+        public ICollection<UserUsageLog>? DailyLogs { get; set; } = new List<UserUsageLog>();
     }
 }

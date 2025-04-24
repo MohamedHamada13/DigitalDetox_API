@@ -97,14 +97,10 @@ namespace DigitalDetox.API.Controllers
 
             var result = await _authService.AddRoleAsync(model);
 
-            if (result.IsAuthenticated)
+            if (!result.IsAuthenticated)
                 return BadRequest(result.FaildMessage);
 
             return Ok(result);
         }
-
-
-
-
     }
 }
