@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,7 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
         public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
+            await SaveAsync();
         }
 
         public void DeleteAsync(T entity)
@@ -40,9 +42,10 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
             _dbSet.Remove(entity);
         }
 
-        public void UpdateAsync(T entity)
+        public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+            await SaveAsync();
         }
 
         public async Task SaveAsync()

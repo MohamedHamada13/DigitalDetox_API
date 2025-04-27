@@ -9,6 +9,6 @@ namespace DigitalDetox.Core.DTOs.DailyUsageLogDtos
     public class DailyLogResponse
     {
         public string Message { get; set; }
-        public bool IsLoged { get; set; }
+        public bool IsLogged { get; set; }
     }
 }

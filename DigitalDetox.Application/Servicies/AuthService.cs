@@ -138,14 +138,15 @@ namespace DigitalDetox.Application.Servicies
             {
                 IsAuthenticated = true,
                 UserName = newUser.UserName,
+                Email = email,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwt),
                 ExpiresOn = jwt.ValidTo.ToLocalTime(),
                 Roles = roles.ToList(),
                 RefreshToken = newUser.RefreshToken,
                 RefreshTokenExpiration = newUser.RefreshTokenExpiryTime.ToLocalTime()
+
             };
         }
-
 
 
         public async Task<AuthModel> LoginAsync(LoginModel model)

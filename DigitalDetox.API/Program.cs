@@ -18,6 +18,7 @@ using DigitalDetox.Core.DTOs.ChallengeDto;
 using DigitalDetox.Infrastructure.ExServices;
 using DigitalDetox.Core.Entities.AuthModels;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserStoreTemporaryRepos, UserStoreTemporaryRepos>();
 builder.Services.AddScoped<IAppRepos, AppRepos>();
 builder.Services.AddScoped<IDailyUsageLogRepos, DailyUsageLogRepos>();
+builder.Services.AddHttpContextAccessor(); // IHttpContextAccessor used to get the user details using token. 
+
 
 
 
@@ -75,6 +78,7 @@ builder.Services.AddAuthentication(options => // Configure the default Schema
 }) // Add Authentication Options
     .AddJwtBearer(o =>
     {
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         o.RequireHttpsMetadata = false;
         o.SaveToken = false;
         o.TokenValidationParameters = new TokenValidationParameters

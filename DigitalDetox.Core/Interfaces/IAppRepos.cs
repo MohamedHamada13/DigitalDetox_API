@@ -10,6 +10,6 @@ namespace DigitalDetox.Core.Interfaces
     public interface IAppRepos : IGenericRepos<App>
     {
         Task<App?> AddNewApp(string appName);
-        Task<App?> IsExist(string appName);
+        Task<App?> GetAppByNameAsync(string appName);
     }
 }

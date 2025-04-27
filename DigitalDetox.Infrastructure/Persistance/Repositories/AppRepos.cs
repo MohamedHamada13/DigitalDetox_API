@@ -33,7 +33,7 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
             return newApp;
         }
 
-        public async Task<App?> IsExist(string appName)
+        public async Task<App?> GetAppByNameAsync(string appName)
         {
             var app = await _ctx.Apps.FirstOrDefaultAsync(a => a.Name == appName);
             return app;

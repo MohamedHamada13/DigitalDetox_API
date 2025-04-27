@@ -12,7 +12,7 @@ namespace DigitalDetox.Core.Interfaces
         IQueryable<T>? GetAll();
         Task<T?> GetAsync(int id);
         Task AddAsync(T entity);
-        void UpdateAsync(T entity);
+        Task UpdateAsync(T entity);
         void DeleteAsync(T entity);
         Task SaveAsync();
     }

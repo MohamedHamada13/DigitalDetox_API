@@ -22,37 +22,33 @@ namespace DigitalDetox.API.Controllers
                 return BadRequest(ModelState);
 
             var result = await _dailyLogService.LogUsageAsync(model);
-            if(!result.IsLoged)
+            if(!result.IsLogged)
                 return BadRequest(result.Message);
 
             return Ok(result);
         }
 
-
         // Important Note: these endpoints can be of httpPost type if want to send the request from body not url.
         [HttpGet("Daily")]
-        public async Task<IActionResult> GetDailyLogsAsync([FromQuery] string userId, [FromQuery] DateOnly dayDate)
+        public async Task<IActionResult> GetDailyLogsAsync([FromBody] DateOnly dayDate)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _dailyLogService.GetDailyLogsAsync(userId, dayDate);
+            var result = await _dailyLogService.GetDailyLogsAsync(dayDate);
             if(result == null)
-                return BadRequest($"User id or date is not correct");
+                return BadRequest($"Invalid or expired token");
 
             return Ok(result);
         }
 
 
         [HttpGet("InRange")]
-        public async Task<IActionResult> GetLogsInRangeAsync([FromQuery] string userId, DateOnly startDate, DateOnly endDate)
+        public async Task<IActionResult> GetLogsInRangeAsync(DateOnly startDate, DateOnly endDate)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-                return BadRequest("User id is required");
-
-            var result = await _dailyLogService.GetLogsInRangeAsync(userId, startDate, endDate);
+            var result = await _dailyLogService.GetLogsInRangeAsync(startDate, endDate);
             if (result == null)
-                return BadRequest("User id is incorrect");
+                return BadRequest("Invalid of expired token");
 
             return Ok(result);
         }
