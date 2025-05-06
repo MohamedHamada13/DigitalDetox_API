@@ -1,15 +1,20 @@
 ﻿using DigitalDetox.Core.DTOs;
+using DigitalDetox.Core.DTOs.OtpCodeDtos;
 using DigitalDetox.Core.Entities.AuthModels;
 using DigitalDetox.Core.Interfaces;
 using DigitalDetox.Infrastructure.ExServices;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Web.Providers.Entities;
 
 namespace DigitalDetox.API.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -51,6 +56,47 @@ namespace DigitalDetox.API.Controllers
             return Ok(result);
         }
 
+        
+        [HttpPost("SendOtpCode")]
+        [EnableRateLimiting("OtpPolicy")]
+        public async Task<IActionResult> SendOtpCode([FromBody] SendOtpCodeRequest model)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authService.SendOtpCode(model);
+            if(!result.EmailIsExist)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
+
+        [HttpPost("OtpCodeChechout")]
+        [EnableRateLimiting("OtpPolicy")]
+        public async Task<IActionResult> OtpCodeChechout([FromBody] OtpCodeRequest model)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authService.OtpCodeChechout(model);
+            if(!result.IsTrue)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authService.ResetPassword(model);
+            if(!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)

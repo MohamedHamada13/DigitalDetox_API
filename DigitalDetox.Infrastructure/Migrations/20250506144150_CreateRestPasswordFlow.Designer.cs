@@ -4,6 +4,7 @@ using DigitalDetox.Core.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalDetox.Infrastructure.Migrations
 {
     [DbContext(typeof(DegitalDbContext))]
-    partial class DegitalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506144150_CreateRestPasswordFlow")]
+    partial class CreateRestPasswordFlow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +36,6 @@ namespace DigitalDetox.Infrastructure.Migrations
 
                     b.Property<DateTime>("ExpirationTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsChecked")
-                        .HasColumnType("bit");
 
                     b.HasKey("Email");
 
@@ -207,7 +207,7 @@ namespace DigitalDetox.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 5, 6, 18, 3, 35, 85, DateTimeKind.Local).AddTicks(238));
+                        .HasDefaultValue(new DateTime(2025, 5, 6, 17, 41, 49, 70, DateTimeKind.Local).AddTicks(5471));
 
                     b.Property<string>("Description")
                         .IsRequired()

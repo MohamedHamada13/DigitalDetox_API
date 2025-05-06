@@ -10,7 +10,9 @@ using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using DigitalDetox.Infrastructure.ExServices;
 using DigitalDetox.Core.Entities.AuthModels;
-
+using System.Web.Http;
+using System.Data.Entity;
+using DigitalDetox.Core.DTOs.OtpCodeDtos;
 namespace DigitalDetox.Application.Servicies
 {
     public class AuthService : IAuthService
@@ -19,17 +21,20 @@ namespace DigitalDetox.Application.Servicies
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWT _Jwt;
         private readonly IUserStoreTemporaryRepos _UserStoreCtx;
+        private readonly IOtpCodeRepos _otpCodeRepos;
 
         public AuthService(UserManager<AppUser> userManager, IOptions<JWT> Jwt, RoleManager<IdentityRole> roleManager,
-            IUserStoreTemporaryRepos ctx)
+            IUserStoreTemporaryRepos ctx, IOtpCodeRepos otpCodeRepos)
         {
             _userManager = userManager;
             _Jwt = Jwt.Value;
             _roleManager = roleManager;
             _UserStoreCtx = ctx;
+            _otpCodeRepos = otpCodeRepos;
         }
 
         // Send the verifing message in Gmail using smtp.
+        #region Signup
         public async Task<SignUpResponse> InitSignUpAsync(SignUpReqModel model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) != null)
@@ -80,29 +85,6 @@ namespace DigitalDetox.Application.Servicies
             return new SignUpResponse { Email = model.Email, IsSuccess = true }; // return email to the enduser to send it agian in VerifyCodeAsync() endpoint.
         }
 
-        public async Task<SignUpResponse> ReSendCode(string email)
-        {
-            var newCode = new Random().Next(100000, 999999).ToString();
-            var user = await _UserStoreCtx.GetByEmail(email);
-
-            if (user == null)
-                return new SignUpResponse { FaildMessage = "Email is Incorrect. [mistake from frontend]" };
-
-            user.Code = newCode;
-            await _UserStoreCtx.UpdateAsync(user);
-
-            try
-            {
-                EmailService.SendEmail(email, "Your verification code", $"Your code is: {newCode}");
-            }
-            catch 
-            {
-                return new SignUpResponse { FaildMessage = "Email not send, try agian" };
-            }
-            
-            return new SignUpResponse { Email = email, IsSuccess = true };
-        }
-
         public async Task<AuthModel> VerifyCodeAsync(string email, string inputCode)
         {
             var pendingUser = await _UserStoreCtx.GetByEmail(email);
@@ -113,7 +95,7 @@ namespace DigitalDetox.Application.Servicies
             if (pendingUser.ExpiresAt < DateTime.UtcNow)
                 return new AuthModel { FaildMessage = "Expired code." };
 
-            if (pendingUser.Code != inputCode) 
+            if (pendingUser.Code != inputCode)
                 return new AuthModel { FaildMessage = "Invalid code." };
 
             var newUser = new AppUser(pendingUser);
@@ -144,10 +126,32 @@ namespace DigitalDetox.Application.Servicies
                 Roles = roles.ToList(),
                 RefreshToken = newUser.RefreshToken,
                 RefreshTokenExpiration = newUser.RefreshTokenExpiryTime.ToLocalTime()
-
             };
         }
+        #endregion
 
+        public async Task<SignUpResponse> ReSendCode(string email)
+        {
+            var newCode = new Random().Next(100000, 999999).ToString();
+            var user = await _UserStoreCtx.GetByEmail(email);
+
+            if (user == null)
+                return new SignUpResponse { FaildMessage = "Email is Incorrect. [mistake from frontend]" };
+
+            user.Code = newCode;
+            await _UserStoreCtx.UpdateAsync(user);
+
+            try
+            {
+                EmailService.SendEmail(email, "Your verification code", $"Your code is: {newCode}");
+            }
+            catch
+            {
+                return new SignUpResponse { FaildMessage = "Email not send, try agian" };
+            }
+
+            return new SignUpResponse { Email = email, IsSuccess = true };
+        }
 
         public async Task<AuthModel> LoginAsync(LoginModel model)
         {
@@ -177,6 +181,81 @@ namespace DigitalDetox.Application.Servicies
                 Roles = roles.ToList()
             };
         }
+
+
+        #region Reset Password 
+        public async Task<SendOtpCodeResponse> SendOtpCode(SendOtpCodeRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return new SendOtpCodeResponse { Message = "If the email exists, a code has been sent." }; // here
+
+            var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
+
+            // Checkout if the otpCode is actually exist, and remove it before create a new one.
+            var existingOtp = await _otpCodeRepos.GetOtpByEmail(model.Email);
+            if (existingOtp != null)
+                await _otpCodeRepos.DeleteAsync(existingOtp);
+
+            // Create a new OtpCode
+            var otp = new OtpCode
+            {
+                Email = model.Email,
+                Code = code,
+                ExpirationTime = DateTime.UtcNow.AddMinutes(10)
+            };
+            await _otpCodeRepos.AddAsync(otp);
+
+            EmailService.SendEmail(model.Email, "Password Reset Code", $"Your reset code is: {code}");
+
+            return new SendOtpCodeResponse { EmailIsExist = true, Message = "Code is sent to the email successfully" };
+        }
+
+        public async Task<OtpCodeResponse> OtpCodeChechout(OtpCodeRequest model)
+        {
+            var otp = await _otpCodeRepos.GetOtpByEmail(model.Email);
+            if (otp == null)
+                return new OtpCodeResponse { Message = "Invalid email" };
+
+            if (otp.Code != model.Code)
+                return new OtpCodeResponse { Message = "Code is incorrect." };
+
+            if (otp.ExpirationTime < DateTime.UtcNow)
+            {
+                await _otpCodeRepos.DeleteAsync(otp);
+                return new OtpCodeResponse { Message = "expired code, use SendOtpCode again" };
+            }
+
+            otp.IsChecked = true;
+            await _otpCodeRepos.UpdateAsync(otp);
+            return new OtpCodeResponse { IsTrue = true, Message = "Correct code." };
+        }
+
+        public async Task<ResetPasswordResponse> ResetPassword(ResetPasswordRequest model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return new ResetPasswordResponse { Message = "Invalid email, the email not registerd" };
+
+            var otp = await _otpCodeRepos.GetOtpByEmail(model.Email);
+            if (otp == null)
+                return new ResetPasswordResponse { Message = "Verify your email first then Checkout the code, mother father" };
+
+            if (!otp.IsChecked)
+                return new ResetPasswordResponse { Message = "Checkout the code first mother father" };
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
+            if (!result.Succeeded)
+                return new ResetPasswordResponse { Message = "Password reset failed." };
+
+            await _otpCodeRepos.DeleteAsync(otp);
+
+            return new ResetPasswordResponse { IsSuccess = true, Message = "Password has been updated" };
+        }
+        #endregion
+
 
         public async Task<AuthModel> RefreshTokenAsync(string token)
         {
@@ -277,10 +356,10 @@ namespace DigitalDetox.Application.Servicies
             return token;
         }
 
-        public async Task<bool> LogoutAsync(string refToken)
+        public async Task<bool> LogoutAsync(string userRefreshToken)
         {
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.RefreshToken == refToken);
+                .FirstOrDefaultAsync(u => u.RefreshToken == userRefreshToken);
 
             if (user == null) 
                 return false;
@@ -299,56 +378,5 @@ namespace DigitalDetox.Application.Servicies
             rng.GetBytes(randomBytes);
             return Convert.ToBase64String(randomBytes);
         }
-
-
-
-        #region Old unUsed Methods
-        /*
-        public async Task<AuthModel> RegisterAsync(RegisterModel model)
-        {
-            // Ensure that the user not in the DB 
-            if (await _userManager.FindByEmailAsync(model.Email) is not null)
-                return new AuthModel { FaildMessage = "Email is already registered" };
-
-            if (await _userManager.FindByNameAsync(model.UserName) is not null)
-                return new AuthModel { FaildMessage = $"{model.UserName} user name is already registered" };
-
-            // Map the `RegisterModel` into `AppUser`.
-            AppUser newUser = new AppUser(model);
-
-            // Create a new User with hashd password
-            var result = await _userManager.CreateAsync(newUser, model.Password);
-
-            if (!result.Succeeded)
-                return new AuthModel { FaildMessage = string.Join(", ", result.Errors.Select(e => e.Description)) };
-
-            // Add the new user to a specific role (User)
-            await _userManager.AddToRoleAsync(newUser, "User");
-
-            // Generate JWT token for the created user & get his roles
-            var JwtToken = await GenerateJwtToken(newUser);
-            var roles = await _userManager.GetRolesAsync(newUser);
-
-            // Generate refresh token, then assign it to the user data
-            newUser.RefreshToken = GenerateRefreshToken();
-            newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            await _userManager.UpdateAsync(newUser);
-
-            // Return the registered user data includes token & roles
-            return new AuthModel
-            {
-                ExpiresOn = JwtToken.ValidTo.ToLocalTime(), // To imitates the pc local time
-                IsAuthenticated = true,
-                Roles = roles.ToList(),
-                Token = new JwtSecurityTokenHandler().WriteToken(JwtToken),
-                UserName = newUser.UserName,
-                RefreshToken = newUser.RefreshToken,
-                RefreshTokenExpiration = newUser.RefreshTokenExpiryTime.ToLocalTime()
-            };
-        }
-
-
-        */
-        #endregion
     }
 }

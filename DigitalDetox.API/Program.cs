@@ -10,15 +10,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.Text;
 using DigitalDetox.Core.Entities.Models;
 using DigitalDetox.Core.DTOs.ChallengeDto;
-using DigitalDetox.Infrastructure.ExServices;
 using DigitalDetox.Core.Entities.AuthModels;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,10 +41,23 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserStoreTemporaryRepos, UserStoreTemporaryRepos>();
 builder.Services.AddScoped<IAppRepos, AppRepos>();
 builder.Services.AddScoped<IDailyUsageLogRepos, DailyUsageLogRepos>();
+builder.Services.AddScoped<IOtpCodeRepos, OtpCodeRepos>();
 builder.Services.AddHttpContextAccessor(); // IHttpContextAccessor used to get the user details using token. 
 
-
-
+// Rate limiter
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("OtpPolicy", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3, // allow 3 requests
+                Window = TimeSpan.FromMinutes(1), // per minute
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 2 // optional: how many to queue before rejecting
+            }));
+});
 
 
 // Add CORS Services
@@ -66,11 +77,14 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedEmail = true;
 });
 
+
+// Configure Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>() 
+    .AddEntityFrameworkStores<DegitalDbContext>()
+    .AddDefaultTokenProviders();
+
 // Auth Configurations
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT")); // Map appsetting JWT values into JWT class.
-builder.Services.AddIdentity<AppUser, IdentityRole>() // Register Identity
-    .AddEntityFrameworkStores<DegitalDbContext>();
-    //.AddDefaultTokenProviders();
 builder.Services.AddAuthentication(options => // Configure the default Schema
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -125,7 +139,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
+app.UseRateLimiter();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");

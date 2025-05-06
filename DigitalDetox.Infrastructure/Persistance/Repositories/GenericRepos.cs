@@ -37,9 +37,10 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
             await SaveAsync();
         }
 
-        public void DeleteAsync(T entity)
+        public async Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
+            await SaveAsync();
         }
 
         public async Task UpdateAsync(T entity)

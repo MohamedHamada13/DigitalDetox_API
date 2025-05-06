@@ -1,4 +1,5 @@
-﻿using DigitalDetox.Core.Entities.Models;
+﻿using DigitalDetox.Core.Entities.AuthModels;
+using DigitalDetox.Core.Entities.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,6 +21,7 @@ namespace DigitalDetox.Core.Context
         public DbSet<DetoxPlan> DetoxPlans { get; set; }
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<UserStoreTemporary> UserStoreTemporary { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

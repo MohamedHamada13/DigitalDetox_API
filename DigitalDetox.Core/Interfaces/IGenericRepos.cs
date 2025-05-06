@@ -13,7 +13,7 @@ namespace DigitalDetox.Core.Interfaces
         Task<T?> GetAsync(int id);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
-        void DeleteAsync(T entity);
+        Task DeleteAsync(T entity);
         Task SaveAsync();
     }
 }

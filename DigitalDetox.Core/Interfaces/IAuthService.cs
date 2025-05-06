@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using DigitalDetox.Core.DTOs.OtpCodeDtos;
 using DigitalDetox.Core.Entities.AuthModels;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
@@ -19,5 +20,8 @@ namespace DigitalDetox.Core.Interfaces
         Task<SignUpResponse> InitSignUpAsync(SignUpReqModel model);
         Task<AuthModel> VerifyCodeAsync(string email, string inputCode);
         Task<SignUpResponse> ReSendCode(string email);
+        Task<SendOtpCodeResponse> SendOtpCode(SendOtpCodeRequest model);
+        Task<OtpCodeResponse> OtpCodeChechout(OtpCodeRequest model);
+        Task<ResetPasswordResponse> ResetPassword(ResetPasswordRequest model);
     }
 }

@@ -25,7 +25,7 @@ namespace DigitalDetox.Infrastructure.ExServices
                 client.Send("digitaldetox259@gmail.com", emailTo, subject, body);
                 return string.Empty;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return ex.Message;
             }
