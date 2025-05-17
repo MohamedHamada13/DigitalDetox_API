@@ -42,11 +42,10 @@ namespace DigitalDetox.API.Controllers
             return Ok(result);
         }
 
-
         [HttpGet("InRange")]
-        public async Task<IActionResult> GetLogsInRangeAsync(DateOnly startDate, DateOnly endDate)
+        public async Task<IActionResult> GetLogsInRangeAsync([FromBody] UsageInRangeRequest model)
         {
-            var result = await _dailyLogService.GetLogsInRangeAsync(startDate, endDate);
+            var result = await _dailyLogService.GetLogsInRangeAsync(model);
             if (result == null)
                 return BadRequest("Invalid of expired token");
 

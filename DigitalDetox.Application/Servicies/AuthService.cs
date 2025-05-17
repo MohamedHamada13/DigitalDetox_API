@@ -188,7 +188,7 @@ namespace DigitalDetox.Application.Servicies
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return new SendOtpCodeResponse { Message = "If the email exists, a code has been sent." }; // here
+                return new SendOtpCodeResponse { Message = "If the email exists, a code has been sent.", EmailIsExist = true }; // make it true to avoid enumarate attacks.
 
             var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 

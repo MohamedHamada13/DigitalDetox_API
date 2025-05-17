@@ -11,8 +11,9 @@ namespace DigitalDetox.Core.DTOs.DailyUsageLogDtos
     {
         public string AppName { get; set; }
         public TimeSpan UsageTime { get; set; }
+        public string? WebIconUrl { get; set; }
 
-        
+
 
         public SubDailyUsageLogGetDto() { }
 
@@ -20,6 +21,7 @@ namespace DigitalDetox.Core.DTOs.DailyUsageLogDtos
         {
             UsageTime = model.UsageTime;
             AppName = model.App.Name;
+            WebIconUrl = model.App.WebIconUrl;
         }
     }
 }

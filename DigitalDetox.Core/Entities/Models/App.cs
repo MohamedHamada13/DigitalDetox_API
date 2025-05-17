@@ -10,6 +10,7 @@ namespace DigitalDetox.Core.Entities.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string? WebIconUrl { get; set; }
 
         public ICollection<UserUsageLog>? DailyLogs { get; set; } = new List<UserUsageLog>();
     }

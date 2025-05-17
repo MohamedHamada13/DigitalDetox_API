@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.DTOs.DailyUsageLogDtos
 {
-    public class DailyLogRequest
-    {
+    public class AppUsageInfo {
         [Required]
-        public DateOnly LogDate { get; set; }
-
+        public string AppName { get; set; }
         [Required]
-        public List<AppUsageInfo> AppsInfo { get; set; }
+        public TimeSpan TimeUsage { get; set; }
+        public string? WebIconUrl { get; set; }
     }
 }

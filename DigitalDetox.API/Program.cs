@@ -17,6 +17,7 @@ using DigitalDetox.Core.Entities.AuthModels;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,16 +48,22 @@ builder.Services.AddHttpContextAccessor(); // IHttpContextAccessor used to get t
 // Rate limiter
 builder.Services.AddRateLimiter(options =>
 {
+    options.RejectionStatusCode = 429;
     options.AddPolicy("OtpPolicy", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        Console.WriteLine("RateLimiter IP: " + ip); // Add this to debug
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ip,
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 3, // allow 3 requests
-                Window = TimeSpan.FromMinutes(1), // per minute
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 2 // optional: how many to queue before rejecting
-            }));
+                QueueLimit = 0
+            });
+    });
 });
 
 
@@ -106,9 +113,21 @@ builder.Services.AddAuthentication(options => // Configure the default Schema
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
             RoleClaimType = ClaimTypes.Role
         };
+    })
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options => // Google Authentication
+    {
+        options.ClientId = builder.Configuration["GoogleAuthSettings:ClientId"];
+        options.ClientSecret = builder.Configuration["GoogleAuthSettings:ClientSecret"];
+        options.CallbackPath = "/api/auth/google-callback"; // Must match what's in Google Cloud
     });
+builder.Services.AddAuthentication()
+    .AddCookie(); // for cookie
+
 
 var app = builder.Build();
+
+app.UseRouting();
+app.UseRateLimiter();
 
 // Seeding Roles
 using (var scope = app.Services.CreateScope())
@@ -139,9 +158,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseRateLimiter();
 app.UseHttpsRedirection();
-app.UseRouting();
+
 app.UseCors("AllowAll");
 
 app.UseAuthentication();

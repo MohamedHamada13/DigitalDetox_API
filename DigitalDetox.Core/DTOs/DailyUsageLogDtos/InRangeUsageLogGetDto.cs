@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DigitalDetox.Core.DTOs.DailyUsageLogDtos
 {
-    public class WeeklyUsageLogGetDto
+    public class InRangeUsageLogGetDto
     {
         public string userName { get; set; }
-        public List<SubWeeklyUsageLogGetDto> weekLogs { get; set; }
+        public List<SubInRangeUsageLogGetDto> Logs { get; set; }
     }
 }

@@ -20,11 +20,12 @@ namespace DigitalDetox.Infrastructure.Persistance.Repositories
         }
 
 
-        public async Task<App> AddNewApp(string appName)
+        public async Task<App> AddNewApp(string appName, string? webIconUrl = null!)
         {
             var newApp = new App
             {
                 Name = appName,
+                WebIconUrl = webIconUrl
             };
 
             await _ctx.Apps.AddAsync(newApp);

@@ -14,7 +14,7 @@ namespace DigitalDetox.Core.Interfaces
 
 
         Task<DailyUsageLogGetDto?> GetDailyLogsAsync(DateOnly dayDate);
-        Task<WeeklyUsageLogGetDto?> GetLogsInRangeAsync(DateOnly startDate, DateOnly endDate);
+        Task<InRangeUsageLogGetDto?> GetLogsInRangeAsync(UsageInRangeRequest model);
 
         Task<IEnumerable<UserUsageLog>> GetMonthlyLogsAsync(string userId, int month, int year);
 

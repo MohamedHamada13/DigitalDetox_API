@@ -17,8 +17,6 @@ namespace DigitalDetox.Core.Context
 
         public DbSet<UserUsageLog> DailyUsageLogs { get; set; }
         public DbSet<App> Apps { get; set; }
-        public DbSet<ProgressLog> ProgressLogs{ get; set; }
-        public DbSet<DetoxPlan> DetoxPlans { get; set; }
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<UserStoreTemporary> UserStoreTemporary { get; set; }
         public DbSet<OtpCode> OtpCodes { get; set; }

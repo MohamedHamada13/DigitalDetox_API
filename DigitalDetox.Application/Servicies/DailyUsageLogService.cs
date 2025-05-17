@@ -47,41 +47,40 @@ namespace DigitalDetox.Application.Servicies
                 return new DailyLogResponse { Message = "Invalid user id, user not found!" };
             }
 
-            foreach (var map in model.appUsages)
+            foreach (var appInfo in model.AppsInfo)
             {
-                var appName = map.Key.Trim().ToLower();
+                var appName = appInfo.AppName.Trim().ToLower();
                 var app = await _appRepos.GetAppByNameAsync(appName);
 
                 if (app == null)
                 {
-                    app = await _appRepos.AddNewApp(appName);
+                    app = await _appRepos.AddNewApp(appName, appInfo.WebIconUrl);
                 }
 
                 try
                 {
-                    var dailyExistingLog = await _DailyRepos.GetLogByUserAppDate(userId, app.Id, model.logDate);
+                    var dailyExistingLog = await _DailyRepos.GetLogByUserAppDate(userId, app.Id, model.LogDate);
                     if (dailyExistingLog == null)
                     {
                         await _DailyRepos.AddAsync(new UserUsageLog
                         {
                             UserId = userId,
                             AppId = app.Id,
-                            UsageTime = map.Value,
-                            DailyLogDate = model.logDate,
+                            UsageTime = appInfo.TimeUsage,
+                            DailyLogDate = model.LogDate,
                         });
                     }
                     else
                     {
-                        dailyExistingLog.UsageTime += map.Value;
+                        dailyExistingLog.UsageTime += appInfo.TimeUsage;
                         await _DailyRepos.UpdateAsync(dailyExistingLog);
                     }
                 }
                 catch (Exception ex)
                 {
-                    return new DailyLogResponse { Message = $"Failed to log usage for app '{map.Key}': {ex.Message}" };
+                    return new DailyLogResponse { Message = $"Failed to log usage for app '{appInfo.AppName}': {ex.Message}" };
                 }
             }
-            //await _DailyRepos.SaveAsync();
             return new DailyLogResponse { Message = "Log process is succeeded", IsLogged = true };
         }
 
@@ -90,26 +89,23 @@ namespace DigitalDetox.Application.Servicies
             var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (string.IsNullOrEmpty(userId))
                 return null;
-            Console.WriteLine("here1");
 
             var userName = await _userManager.Users
                 .Where(u => u.Id == userId)
                 .Select(u => $"{u.FirstName} {u.LastName}")
                 .FirstOrDefaultAsync();
+
             if (userName == null)
                 return null;
-            Console.WriteLine("here2");
 
             var userDailyLogs = await _DailyRepos.GetDailyLogs(userId, dayDate)!.ToListAsync();
             if (!userDailyLogs.Any())
                 return new DailyUsageLogGetDto
-                    {
-                        userName = userName,
-                        dayDate = dayDate,
-                        Logs = []
-                    };
-
-            Console.WriteLine("here3");
+                {
+                    userName = userName,
+                    dayDate = dayDate,
+                    Logs = []
+                };
 
             var subUserDailyLogsDto = userDailyLogs.Select(log => new SubDailyUsageLogGetDto(log)).ToList();
 
@@ -123,7 +119,7 @@ namespace DigitalDetox.Application.Servicies
             return userDailyLogsDto;
         }
 
-        public async Task<WeeklyUsageLogGetDto?> GetLogsInRangeAsync(DateOnly startDate, DateOnly endDate)
+        public async Task<InRangeUsageLogGetDto?> GetLogsInRangeAsync(UsageInRangeRequest model)
         {
             var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -135,37 +131,36 @@ namespace DigitalDetox.Application.Servicies
             if (user == null)
                 return null;
 
-            var userWeekLogs = await _DailyRepos.GetLogsInRange(userId, startDate, endDate)
+            var userInRangeLogs = await _DailyRepos.GetLogsInRange(userId, model.StartDate, model.EndDate)
                 .ToListAsync();
 
-            var logsGrouped = userWeekLogs
+            var logsGroupedByDate = userInRangeLogs
                 .GroupBy(log => log.DailyLogDate)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(log => new SubDailyUsageLogGetDto(log)).ToList()
-                );
+                .OrderBy(g => g.Key)
+                .ToList();
 
-            var userWeekUsage = new WeeklyUsageLogGetDto
+            var userInRangeUsage = new InRangeUsageLogGetDto
             {
                 userName = $"{user.FirstName} {user.LastName}",
-                weekLogs = new List<SubWeeklyUsageLogGetDto>()
+                Logs = new List<SubInRangeUsageLogGetDto>()
             };
 
-            var totalDays = (endDate.ToDateTime(TimeOnly.MinValue) - startDate.ToDateTime(TimeOnly.MinValue)).Days + 1;
+            var totalDays = (model.EndDate.ToDateTime(TimeOnly.MinValue) - model.StartDate.ToDateTime(TimeOnly.MinValue)).Days + 1;
 
-            for (int i = 0; i < totalDays; ++i)
+            for (int i = 0; i < totalDays; i++)
             {
-                var currentDate = startDate.AddDays(i);
-                logsGrouped.TryGetValue(currentDate, out var dailyLogs);
+                var currentDate = model.StartDate.AddDays(i);
 
-                userWeekUsage.weekLogs.Add(new SubWeeklyUsageLogGetDto
+                var group = logsGroupedByDate.FirstOrDefault(g => g.Key == currentDate);
+
+                userInRangeUsage.Logs.Add(new SubInRangeUsageLogGetDto
                 {
                     DayDate = currentDate,
-                    DailyLogs = dailyLogs ?? new List<SubDailyUsageLogGetDto>()
+                    DailyLogs = group?.Select(log => new SubDailyUsageLogGetDto(log)).ToList() ?? new List<SubDailyUsageLogGetDto>()
                 });
             }
-
-            return userWeekUsage;
+        
+            return userInRangeUsage;
         }
 
 

@@ -59,6 +59,7 @@ namespace DigitalDetox.API.Controllers
         
         [HttpPost("SendOtpCode")]
         [EnableRateLimiting("OtpPolicy")]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<IActionResult> SendOtpCode([FromBody] SendOtpCodeRequest model)
         {
             if(!ModelState.IsValid)
@@ -73,6 +74,7 @@ namespace DigitalDetox.API.Controllers
 
         [HttpPost("OtpCodeChechout")]
         [EnableRateLimiting("OtpPolicy")]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<IActionResult> OtpCodeChechout([FromBody] OtpCodeRequest model)
         {
             if(!ModelState.IsValid)
